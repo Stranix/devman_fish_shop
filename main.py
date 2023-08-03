@@ -1,14 +1,15 @@
 import logging
 
 from config.settings import settings
-from utils import generate_elastic_token
+from utils import generate_elastic_token, get_products_in_catalog
 
 logger = logging.getLogger('fish_bot')
 
 
 def main():
     logger.info('Запуск приложения')
-    generate_elastic_token()
+    token, expire_in = generate_elastic_token()
+    products = get_products_in_catalog(token)
 
 
 if __name__ == '__main__':

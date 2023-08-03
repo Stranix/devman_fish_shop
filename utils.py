@@ -34,3 +34,26 @@ def generate_elastic_token() -> tuple:
         token_expire_in
     )
     return token_access, token_expire_in
+
+
+def get_products_in_catalog(token):
+    logger.info('Получаем список всех продуктов')
+    url = urllib.parse.urljoin(
+        settings.elastic_base_url,
+        '/pcm/products/'
+    )
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json',
+        'EP-Channel': 'web store'
+    }
+    logger.debug('url: %s', url)
+    logger.debug('headers: %s', headers)
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    products = response.json()['data']
+    logger.debug('products: %s', products)
+    logger.info('Продукты получены')
+    return products
