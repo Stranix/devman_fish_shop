@@ -1,10 +1,22 @@
 import logging
 
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
 logger = logging.getLogger('fish_bot')
 
 
 def start(update, context):
-    update.message.reply_text(text='Привет!')
+    keyboard = [
+        [
+            InlineKeyboardButton("Option 1", callback_data='1'),
+            InlineKeyboardButton("Option 2", callback_data='2')
+        ],
+        [
+            InlineKeyboardButton("Option 3", callback_data='3')]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text(text='Привет!', reply_markup=reply_markup)
     return "ECHO"
 
 
