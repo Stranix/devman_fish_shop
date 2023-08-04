@@ -115,7 +115,7 @@ def get_price_book_by_id(token, price_book_id):
     return price_book
 
 
-def get_product_price_in_book_price(
+def get_product_currencies_in_book_price(
         token,
         product_sku,
         price_book_name='Default'
@@ -155,6 +155,27 @@ def get_product_by_id(token, product_id):
     product = response.json()['data']
     logger.debug('products: %s', product)
     logger.info('Продукты получены')
+    return product
+
+
+def get_product_dy_id_with_currencies(
+        token,
+        product_id,
+        price_book_name='Default'
+):
+    logger.info('Получение информации о продукте с ценой')
+    product = get_product_by_id(token, product_id)
+    product_sku = product['attributes']['sku']
+    product_currencies = get_product_currencies_in_book_price(
+        token,
+        product_sku,
+        price_book_name
+    )
+    if not product_currencies:
+        logger.warning('Не нашел подходящих цен для продукта')
+    product.update({'currencies': product_currencies})
+    logger.debug('product_with_currencies: %s', product)
+    logger.info('Данные о продукте получены')
     return product
 
 
