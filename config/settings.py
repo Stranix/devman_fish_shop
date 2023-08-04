@@ -1,6 +1,9 @@
 import logging
 import sys
 
+from pydantic import RedisDsn
+from pydantic import Field
+from pydantic import AliasChoices
 from pydantic_core import ValidationError
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
@@ -13,9 +16,17 @@ class Settings(BaseSettings):
     elastic_store_id: str
     elastic_client_id: str
     elastic_secret_key: str
-    tg_bot_token: str = ''
+    tg_bot_token: str
     tg_admin_chat_id: int = 0
     log_level: str = logging.INFO
+
+    redis_dsn: RedisDsn = Field(
+        'redis://user:password@localhost:6379/1',
+        validation_alias=AliasChoices(
+            'service_redis_dsn',
+            'redis_dsn'
+        ),
+    )
 
     model_config = SettingsConfigDict(
         env_file='.env',
