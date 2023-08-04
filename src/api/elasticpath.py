@@ -59,6 +59,105 @@ def get_products_in_catalog(token):
     return products
 
 
+def get_price_books(token):
+    logger.info('Получаем доступные ценовые книги')
+    url = urllib.parse.urljoin(
+        settings.elastic_base_url,
+        '/pcm/pricebooks/'
+    )
+    headers = {
+        'Authorization': f'Bearer {token}',
+    }
+    logger.debug('url: %s', url)
+    logger.debug('headers: %s', headers)
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    price_books = response.json()['data']
+    logger.debug('price_books: %s', price_books)
+    logger.info('Ценовые книги получены')
+    return price_books
+
+
+def get_price_book_by_name(token, price_book_name='Default'):
+    logger.info('Ищу ценовую книгу по имени %s', price_book_name)
+    for price_book in get_price_books(token):
+        logger.debug('Поиск в price_book: %s', price_book)
+        if price_book['attributes']['name'] == price_book_name:
+            logger.info('Ценовая книга найдена')
+            return price_book
+
+
+def get_price_book_by_id(token, price_book_id):
+    logger.info('Получаю данные ценовой книги с id %s', price_book_id)
+    url = urllib.parse.urljoin(
+        settings.elastic_base_url,
+        f'/pcm/pricebooks/{price_book_id}'
+    )
+    headers = {
+        'Authorization': f'Bearer {token}',
+    }
+    params = {
+        'include': 'prices'
+    }
+    logger.debug('url: %s', url)
+    logger.debug('params: %s', params)
+    logger.debug('headers: %s', headers)
+
+    response = requests.get(url, headers=headers, params=params)
+    logger.debug('response url: %s', response.url)
+    response.raise_for_status()
+
+    price_book = response.json()
+    logger.debug('price_book: %s', price_book)
+    logger.info('Данные ценовой книги получены')
+    return price_book
+
+
+def get_product_price_in_book_price(
+        token,
+        product_sku,
+        price_book_name='Default'
+):
+    logger.info('Ищу цены продукта в ценовой книге')
+    logger.debug('product_sku: %s', product_sku)
+    price_book_id = get_price_book_by_name(token, price_book_name).get('id')
+
+    if not price_book_id:
+        logger.error('Не найдена ценовая книга с именем %s', price_book_name)
+        return
+
+    price_book = get_price_book_by_id(token, price_book_id)
+    for product in price_book.get('included', []):
+        if product_sku == product['attributes']['sku']:
+            currencies = product['attributes']['currencies']
+            logger.debug('currencies: %s', currencies)
+            logger.info('Цены найдены')
+            return currencies
+
+
+def get_product_by_id(token, product_id):
+    logger.info('Получаем информацию о продукте с id: %s', product_id)
+    url = urllib.parse.urljoin(
+        settings.elastic_base_url,
+        f'/pcm/products/{product_id}'
+    )
+    headers = {
+        'Authorization': f'Bearer {token}',
+    }
+    logger.debug('url: %s', url)
+    logger.debug('headers: %s', headers)
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    product = response.json()['data']
+    logger.debug('products: %s', product)
+    logger.info('Продукты получены')
+    return product
+
+
 def add_product_to_cart(token, cart_id, product_id, quantity):
     logger.info('Добавление продуктов в корзину')
     logger.debug(
