@@ -4,7 +4,9 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackContext
 
 import src.api.elasticpath as shop_api
-from src.tg.bot.utils import get_products_keyboard
+
+from src.tg.bot.keyboards import get_products_keyboard
+from src.tg.bot.keyboards import sales_keyboard
 
 logger = logging.getLogger('fish_bot')
 
@@ -51,11 +53,6 @@ def handle_menu(update: Update, context: CallbackContext):
     
     {product_description}
     """
-    reply_markup = InlineKeyboardMarkup(
-        [
-            [InlineKeyboardButton("Назад", callback_data="menu")]
-        ]
-    )
     context.bot.delete_message(
         chat_id=callback_query.message.chat_id,
         message_id=callback_query.message.message_id
@@ -64,7 +61,7 @@ def handle_menu(update: Update, context: CallbackContext):
         chat_id=callback_query.message.chat_id,
         photo=product_photo,
         caption=product_card_msg,
-        reply_markup=reply_markup
+        reply_markup=sales_keyboard
     )
     return 'HANDLE_DESCRIPTION'
 
