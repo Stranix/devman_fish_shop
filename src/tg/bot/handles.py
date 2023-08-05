@@ -55,6 +55,12 @@ def handle_menu(update: Update, context: CallbackContext):
         token,
         product['id']
     )
+    product_image_id = product['relationships']['main_image']['data']['id']
+    product_photo_url = shop_api.get_product_image_url(
+        token,
+        product_image_id
+    )
+    product_photo = shop_api.downloads_file(product_photo_url)
 
     product_card_msg = f""" {product_name}
     
@@ -63,8 +69,11 @@ def handle_menu(update: Update, context: CallbackContext):
     
     {product_description}
     """
-    context.bot.send_message(user_query.message.chat_id, product_card_msg)
-
+    context.bot.send_photo(
+        chat_id=user_query.message.chat_id,
+        photo=product_photo,
+        caption=product_card_msg
+    )
     return 'HANDLE_MENU'
 
 
