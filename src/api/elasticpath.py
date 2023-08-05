@@ -179,6 +179,27 @@ def get_product_dy_id_with_currencies(
     return product
 
 
+def get_product_quantity_in_stock(token, product_id):
+    logger.info('Получаем остаток по продукту %s на складе', product_id)
+    url = urllib.parse.urljoin(
+        settings.elastic_base_url,
+        f'/v2/inventories/{product_id}'
+    )
+    headers = {
+        'Authorization': f'Bearer {token}',
+    }
+    logger.debug('url: %s', url)
+    logger.debug('headers: %s', headers)
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    product_quantity = response.json()['data']['available']
+    logger.debug('product_quantity: %s', product_quantity)
+    logger.info('Остатки по продукту получены')
+    return product_quantity
+
+
 def add_product_to_cart(token, cart_id, product_id, quantity):
     logger.info('Добавление продуктов в корзину')
     logger.debug(
