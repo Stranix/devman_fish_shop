@@ -252,7 +252,36 @@ def get_cart_items(token, cart_id):
     response = requests.get(url, headers=headers)
     response.raise_for_status()
     cart_items = response.json()['data']
-    logger.info('Продукты в корзине получены')
     logger.debug('cart_items: %s', response.json())
+    logger.info('Продукты в корзине получены')
 
     return cart_items
+
+
+def get_product_image_url(token, product_image_id):
+    logger.info('Получаю url изображение продукта')
+    url = urllib.parse.urljoin(
+        settings.elastic_base_url,
+        f'/v2/files/{product_image_id}'
+    )
+    headers = {
+        'Authorization': f'Bearer {token}',
+    }
+    logger.debug('url: %s', url)
+    logger.debug('headers: %s', headers)
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    product_image_link = response.json()['data']['link']['href']
+    logger.debug('product_image_link: %s', product_image_link)
+    logger.info('url изображения получен')
+    return product_image_link
+
+
+def downloads_file(url):
+    logger.info('Загружаю файл по ссылке')
+    logger.debug('url: %s', url)
+    response = requests.get(url)
+    response.raise_for_status()
+    logger.info('Файл получен')
+    return response.content
