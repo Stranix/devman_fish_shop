@@ -15,7 +15,6 @@ from src.api.elasticpath import generate_elastic_token
 
 def start_tg_bot():
     shop_token, shop_token_exp_period = generate_elastic_token()
-
     updater = Updater(settings.tg_bot_token)
     updater.job_queue.run_repeating(
         regenerate_shop_token,
@@ -31,3 +30,4 @@ def start_tg_bot():
     dispatcher.add_handler(CommandHandler('start', handle_users_reply))
 
     updater.start_polling()
+    updater.idle()
