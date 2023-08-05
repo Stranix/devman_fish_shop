@@ -4,6 +4,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackContext
 
 import src.api.elasticpath as shop_api
+from src.tg.bot.utils import get_products_keyboard
 
 logger = logging.getLogger('fish_bot')
 
@@ -11,21 +12,7 @@ logger = logging.getLogger('fish_bot')
 def start(update, context):
     user = update.effective_user
     token = context.bot_data['shop_token']
-    products = shop_api.get_products_in_catalog(token)
-
-    keyboard_buttons = []
-    for product in products:
-        product_id = product['id']
-        product_name = product['attributes']['name']
-
-        inline_button = InlineKeyboardButton(
-            product_name,
-            callback_data=product_id
-        )
-        keyboard_buttons.append(inline_button)
-
-    keyboard = [keyboard_buttons]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = get_products_keyboard(token)
     update.message.reply_markdown_v2(
         text=f'Привет, {user.mention_markdown_v2()}\!\nХотите заказать рыбки?',
         reply_markup=reply_markup
@@ -34,18 +21,13 @@ def start(update, context):
 
 
 def handle_menu(update: Update, context: CallbackContext):
-    user_query = update.callback_query
+    callback_query = update.callback_query
     token = context.bot_data['shop_token']
-    logger.debug('user_query: %s', user_query)
+    logger.debug('callback_query: %s', callback_query)
 
-    context.user_data['product_id'] = user_query.data
-    context.bot.delete_message(
-        chat_id=user_query.message.chat_id,
-        message_id=user_query.message.message_id
-    )
     product = shop_api.get_product_dy_id_with_currencies(
         token,
-        user_query.data
+        callback_query.data
     )
 
     product_name = product['attributes']['name']
@@ -69,12 +51,41 @@ def handle_menu(update: Update, context: CallbackContext):
     
     {product_description}
     """
-    context.bot.send_photo(
-        chat_id=user_query.message.chat_id,
-        photo=product_photo,
-        caption=product_card_msg
+    reply_markup = InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton("Назад", callback_data="menu")]
+        ]
     )
-    return 'HANDLE_MENU'
+    context.bot.delete_message(
+        chat_id=callback_query.message.chat_id,
+        message_id=callback_query.message.message_id
+    )
+    context.bot.send_photo(
+        chat_id=callback_query.message.chat_id,
+        photo=product_photo,
+        caption=product_card_msg,
+        reply_markup=reply_markup
+    )
+    return 'HANDLE_DESCRIPTION'
+
+
+def handle_description(update, context):
+    callback_query = update.callback_query
+    token = context.bot_data['shop_token']
+
+    if callback_query.data == 'menu':
+        context.bot.delete_message(
+            chat_id=update.effective_chat.id,
+            message_id=callback_query.message.message_id,
+        )
+
+        reply_markup = get_products_keyboard(token)
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text='Выберите товар:',
+            reply_markup=reply_markup
+        )
+        return 'HANDLE_MENU'
 
 
 def handle_users_reply(update, context):
@@ -96,6 +107,7 @@ def handle_users_reply(update, context):
     states_functions = {
         'START': start,
         'HANDLE_MENU': handle_menu,
+        'HANDLE_DESCRIPTION': handle_description,
     }
     state_handler = states_functions[user_state]
     next_state = state_handler(update, context)
