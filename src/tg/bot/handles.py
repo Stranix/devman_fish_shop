@@ -65,13 +65,7 @@ def handle_menu(update: Update, context: CallbackContext):
     """
     context.bot.send_message(user_query.message.chat_id, product_card_msg)
 
-    return 'START'
-
-
-def echo(update, context):
-    users_reply = update.message.text
-    update.message.reply_text(users_reply)
-    return "ECHO"
+    return 'HANDLE_MENU'
 
 
 def handle_users_reply(update, context):
