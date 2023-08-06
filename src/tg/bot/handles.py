@@ -128,11 +128,13 @@ def handle_cart(update, context):
     callback_query = update.callback_query
     token = context.bot_data['shop_token']
 
-    if callback_query.data == 'menu':
+    if callback_query.data in ['menu', 'check_out']:
         context.bot.delete_message(
             chat_id=update.effective_chat.id,
             message_id=callback_query.message.message_id,
         )
+
+    if callback_query.data == 'menu':
         reply_markup = get_products_keyboard(token)
         context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -140,6 +142,13 @@ def handle_cart(update, context):
             reply_markup=reply_markup
         )
         return 'HANDLE_MENU'
+
+    if callback_query.data == 'check_out':
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text='Пришлите ваш E-Mail',
+        )
+        return 'WAITING_EMAIL'
 
     shop_api.delete_cart_item(
         token,
@@ -149,7 +158,17 @@ def handle_cart(update, context):
     update.callback_query.data = 'cart'
     return handle_description(update, context)
 
-    
+
+def waiting_email(update, context):
+    email = update.message.text
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=f"Вы прислали мне почту: {email}",
+    )
+    start(update, context)
+    return 'START'
+
+
 def handle_users_reply(update, context):
     db = context.bot_data['db']
     if update.message:
@@ -171,6 +190,7 @@ def handle_users_reply(update, context):
         'HANDLE_MENU': handle_menu,
         'HANDLE_DESCRIPTION': handle_description,
         'HANDLE_CART': handle_cart,
+        'WAITING_EMAIL': waiting_email,
     }
     state_handler = states_functions[user_state]
     next_state = state_handler(update, context)
