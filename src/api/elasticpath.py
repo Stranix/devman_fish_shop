@@ -250,7 +250,7 @@ def get_cart_items(token, cart_id):
     response = requests.get(url, headers=headers)
     response.raise_for_status()
     cart_items = response.json()['data']
-    logger.debug('cart_items: %s', response.json())
+    logger.debug('cart_items: %s', cart_items)
     logger.info('Продукты в корзине получены')
 
     return cart_items
