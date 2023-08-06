@@ -70,6 +70,12 @@ def handle_description(update, context):
     callback_query = update.callback_query
     token = context.bot_data['shop_token']
 
+    if callback_query.data in ['menu', 'cart']:
+        context.bot.delete_message(
+            chat_id=update.effective_chat.id,
+            message_id=callback_query.message.message_id,
+        )
+
     if callback_query.data == 'menu':
         context.bot.delete_message(
             chat_id=update.effective_chat.id,
@@ -83,15 +89,36 @@ def handle_description(update, context):
             reply_markup=reply_markup
         )
         return 'HANDLE_MENU'
+    cart_id = update.effective_chat.id
+
+    if callback_query.data == 'cart':
+        cart_products = shop_api.get_cart_items(token, cart_id)
+        cart_message = ''
+        for product in cart_products['data']:
+            cart_message += f"""
+            {product['name']}
+            {product['description']}
+            ${product['unit_price']['amount'] / 100} per kg
+            сколько в корзине и цена за все
+            {product['quantity']}kg in cart for ${product['value']['amount']}
+                
+            """
+        cart_total_price = cart_products['meta']['display_price']['with_tax']['formatted']
+        cart_message += f'Total: {cart_total_price}'
+        context.bot.send_message(
+            chat_id=cart_id,
+            text=cart_message,
+        )
+        return 'HANDLE_DESCRIPTION'
 
     product_id, product_quantity = callback_query.data.split("_")
-    cart_id = update.effective_chat.id
+
     shop_api.add_product_to_cart(token, cart_id, product_id, product_quantity)
-    shop_api.get_cart_items(token, cart_id)
     callback_query.answer(
         text=f'Добавили в корзину {product_quantity} кг',
         show_alert=True
     )
+    return 'HANDLE_DESCRIPTION'
 
 
 def handle_users_reply(update, context):
