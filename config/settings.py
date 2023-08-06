@@ -17,7 +17,6 @@ class Settings(BaseSettings):
     elastic_client_id: str
     elastic_secret_key: str
     tg_bot_token: str
-    tg_admin_chat_id: int = 0
     log_level: str = logging.INFO
 
     redis_dsn: RedisDsn = Field(
