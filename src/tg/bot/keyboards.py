@@ -53,3 +53,25 @@ def get_products_keyboard(token):
     products_keyboard = InlineKeyboardMarkup(keyboard)
     logger.info('Клавиатура создана')
     return products_keyboard
+
+
+def get_cart_keyboard(cart_products):
+    logger.info('Создаю клавиатуру корзины')
+    logger.debug('cart_products: %s', cart_products)
+    keyboard_buttons = []
+    for product in cart_products['data']:
+        product_name = product['name']
+        product_id = product['id']
+        keyboard_buttons.append([
+            InlineKeyboardButton(
+                f'✖️Убрать из корзины {product_name}',
+                callback_data=product_id
+            )
+        ])
+    keyboard_buttons.append([
+        InlineKeyboardButton(
+            '📄 В МЕНЮ',
+            callback_data='menu')
+    ])
+    logger.info('Клавиатура создана')
+    return InlineKeyboardMarkup(keyboard_buttons)

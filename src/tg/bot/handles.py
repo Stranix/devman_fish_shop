@@ -7,6 +7,7 @@ import src.api.elasticpath as shop_api
 
 from src.tg.bot.keyboards import get_products_keyboard
 from src.tg.bot.keyboards import get_sales_keyboard
+from src.tg.bot.keyboards import get_cart_keyboard
 
 logger = logging.getLogger('fish_bot')
 
@@ -95,7 +96,7 @@ def handle_description(update, context):
         cart_products = shop_api.get_cart_items(token, cart_id)
         cart_message = ''
         for product in cart_products['data']:
-            cart_message += f"""
+            cart_message += f"""Корзина:
             {product['name']}
             {product['description']}
             ${product['unit_price']['amount'] / 100} per kg
@@ -103,13 +104,15 @@ def handle_description(update, context):
             {product['quantity']}kg in cart for ${product['value']['amount']}
                 
             """
-        cart_total_price = cart_products['meta']['display_price']['with_tax']['formatted']
+        cart_total_price = cart_products['meta']['display_price']['with_tax'][
+            'formatted']
         cart_message += f'Total: {cart_total_price}'
         context.bot.send_message(
             chat_id=cart_id,
             text=cart_message,
+            reply_markup=get_cart_keyboard(cart_products)
         )
-        return 'HANDLE_DESCRIPTION'
+        return 'HANDLE_CART'
 
     product_id, product_quantity = callback_query.data.split("_")
 
@@ -119,6 +122,10 @@ def handle_description(update, context):
         show_alert=True
     )
     return 'HANDLE_DESCRIPTION'
+
+
+def handle_cart(update, context):
+    pass
 
 
 def handle_users_reply(update, context):
@@ -141,6 +148,7 @@ def handle_users_reply(update, context):
         'START': start,
         'HANDLE_MENU': handle_menu,
         'HANDLE_DESCRIPTION': handle_description,
+        'HANDLE_CART': handle_cart,
     }
     state_handler = states_functions[user_state]
     next_state = state_handler(update, context)
