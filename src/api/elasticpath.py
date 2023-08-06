@@ -297,6 +297,34 @@ def get_product_image_url(token, product_image_id):
     return product_image_link
 
 
+def create_customer(token, customer_email):
+    logger.info('Записываю клиента в БД')
+    url = urllib.parse.urljoin(
+        settings.elastic_base_url,
+        '/v2/customers'
+    )
+    headers = {
+        'Authorization': f'Bearer {token}',
+    }
+    payload = {
+        'data': {
+            'type': 'cart_item',
+            'name': customer_email,
+            'email': customer_email,
+        }
+    }
+    logger.debug('url: %s', url)
+    logger.debug('headers: %s', headers)
+    logger.debug('payload: %s', payload)
+
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
+    customer = response.json()
+    logger.debug('customer: %s', customer)
+    logger.info('Клиент %s записан в БД')
+    return customer
+
+
 def downloads_file(url):
     logger.info('Загружаю файл по ссылке')
     logger.debug('url: %s', url)
