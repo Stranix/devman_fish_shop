@@ -101,7 +101,7 @@ def handle_description(update, context):
             {product['description']}
             ${product['unit_price']['amount'] / 100} per kg
             сколько в корзине и цена за все
-            {product['quantity']}kg in cart for ${product['value']['amount']}
+            {product['quantity']}kg in cart for ${product['value']['amount'] / 100}
                 
             """
         cart_total_price = cart_products['meta']['display_price']['with_tax'][
@@ -125,7 +125,21 @@ def handle_description(update, context):
 
 
 def handle_cart(update, context):
-    pass
+    callback_query = update.callback_query
+    token = context.bot_data['shop_token']
+
+    if callback_query.data == 'menu':
+        context.bot.delete_message(
+            chat_id=update.effective_chat.id,
+            message_id=callback_query.message.message_id,
+        )
+        reply_markup = get_products_keyboard(token)
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text='Выберите товар:',
+            reply_markup=reply_markup
+        )
+        return 'HANDLE_MENU'
 
 
 def handle_users_reply(update, context):
