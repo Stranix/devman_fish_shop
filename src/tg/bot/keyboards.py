@@ -26,6 +26,7 @@ def get_sales_keyboard(product_id):
                     callback_data=f'{product_id}_10'
                 ),
             ],
+            [InlineKeyboardButton('🛒 КОРЗИНА', callback_data='cart')],
             [InlineKeyboardButton('◀️Назад', callback_data='menu')],
         ]
     )
