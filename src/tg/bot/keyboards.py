@@ -7,16 +7,30 @@ import src.api.elasticpath as shop_api
 
 logger = logging.getLogger('fish_bot')
 
-sales_keyboard = InlineKeyboardMarkup(
-    [
+
+def get_sales_keyboard(product_id):
+    logger.info('Создаю клавиатуру карточки товара')
+    sales_keyboard = InlineKeyboardMarkup(
         [
-            InlineKeyboardButton('➕ 1 кг', callback_data=1),
-            InlineKeyboardButton('➕ 5 кг', callback_data=5),
-            InlineKeyboardButton('➕ 10 кг', callback_data=10),
-        ],
-        [InlineKeyboardButton('◀️Назад', callback_data='menu')],
-    ]
-)
+            [
+                InlineKeyboardButton(
+                    '➕ 1 кг',
+                    callback_data=f'{product_id}_1'
+                ),
+                InlineKeyboardButton(
+                    '➕ 5 кг',
+                    callback_data=f'{product_id}_5'
+                ),
+                InlineKeyboardButton(
+                    '➕ 10 кг',
+                    callback_data=f'{product_id}_10'
+                ),
+            ],
+            [InlineKeyboardButton('◀️Назад', callback_data='menu')],
+        ]
+    )
+    logger.info('Клавиатура создана')
+    return sales_keyboard
 
 
 def get_products_keyboard(token):
@@ -35,6 +49,6 @@ def get_products_keyboard(token):
         keyboard_buttons.append(inline_button)
 
     keyboard = [keyboard_buttons]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    products_keyboard = InlineKeyboardMarkup(keyboard)
     logger.info('Клавиатура создана')
-    return reply_markup
+    return products_keyboard

@@ -215,14 +215,12 @@ def add_product_to_cart(token, cart_id, product_id, quantity):
     headers = {
         'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json',
-        'EP-Channel': 'web store',
-        'EP-Context-Tag': 'clearance'
     }
     payload = {
         'data': {
             'id': product_id,
             'type': 'cart_item',
-            'quantity': quantity,
+            'quantity': int(quantity),
         }
     }
     logger.debug('url: %s', url)

@@ -1,12 +1,12 @@
 import logging
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import Update
 from telegram.ext import CallbackContext
 
 import src.api.elasticpath as shop_api
 
 from src.tg.bot.keyboards import get_products_keyboard
-from src.tg.bot.keyboards import sales_keyboard
+from src.tg.bot.keyboards import get_sales_keyboard
 
 logger = logging.getLogger('fish_bot')
 
@@ -61,7 +61,7 @@ def handle_menu(update: Update, context: CallbackContext):
         chat_id=callback_query.message.chat_id,
         photo=product_photo,
         caption=product_card_msg,
-        reply_markup=sales_keyboard
+        reply_markup=get_sales_keyboard(callback_query.data)
     )
     return 'HANDLE_DESCRIPTION'
 
@@ -83,6 +83,15 @@ def handle_description(update, context):
             reply_markup=reply_markup
         )
         return 'HANDLE_MENU'
+
+    product_id, product_quantity = callback_query.data.split("_")
+    cart_id = update.effective_chat.id
+    shop_api.add_product_to_cart(token, cart_id, product_id, product_quantity)
+    shop_api.get_cart_items(token, cart_id)
+    callback_query.answer(
+        text=f'Добавили в корзину {product_quantity} кг',
+        show_alert=True
+    )
 
 
 def handle_users_reply(update, context):
