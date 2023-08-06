@@ -141,7 +141,15 @@ def handle_cart(update, context):
         )
         return 'HANDLE_MENU'
 
+    shop_api.delete_cart_item(
+        token,
+        update.effective_chat.id,
+        callback_query.data
+    )
+    update.callback_query.data = 'cart'
+    return handle_description(update, context)
 
+    
 def handle_users_reply(update, context):
     db = context.bot_data['db']
     if update.message:
