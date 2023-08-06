@@ -308,7 +308,7 @@ def create_customer(token, customer_email):
     }
     payload = {
         'data': {
-            'type': 'cart_item',
+            'type': 'customer',
             'name': customer_email,
             'email': customer_email,
         }
