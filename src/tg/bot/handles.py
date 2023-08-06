@@ -161,11 +161,12 @@ def handle_cart(update, context):
 
 def waiting_email(update, context):
     email = update.message.text
-    context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=f"Вы прислали мне почту: {email}",
+    token = context.bot_data['shop_token']
+    shop_api.create_customer(token, email)
+    update.message.reply_text(
+        f'Благодарим за заказ! Мы свяжемся с вами по email {email}. \n'
+        f'Для запуска меню используйте команду /start '
     )
-    start(update, context)
     return 'START'
 
 
