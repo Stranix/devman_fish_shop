@@ -68,6 +68,14 @@ def get_cart_keyboard(cart_products):
                 callback_data=product_id
             )
         ])
+
+    if cart_products['data']:
+        keyboard_buttons.append([
+            InlineKeyboardButton(
+                '💳 ОПЛАТА',
+                callback_data='check_out')
+        ])
+
     keyboard_buttons.append([
         InlineKeyboardButton(
             '📄 В МЕНЮ',
