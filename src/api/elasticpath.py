@@ -321,7 +321,7 @@ def create_customer(token, customer_email):
     response.raise_for_status()
     customer = response.json()
     logger.debug('customer: %s', customer)
-    logger.info('Клиент %s записан в БД')
+    logger.info('Клиент %s записан в БД', customer_email)
     return customer
 
 
