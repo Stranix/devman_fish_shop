@@ -256,6 +256,27 @@ def get_cart_items(token, cart_id):
     return cart_items
 
 
+def delete_cart_item(token, cart_id, cart_item_id):
+    logger.info('Удаление товара %s из корзины %s', cart_item_id, cart_id)
+    url = urllib.parse.urljoin(
+        settings.elastic_base_url,
+        f'/v2/carts/{cart_id}/items/{cart_item_id}'
+    )
+    headers = {
+        'Authorization': f'Bearer {token}',
+    }
+    logger.debug('url: %s', url)
+    logger.debug('headers: %s', headers)
+
+    response = requests.delete(url, headers=headers)
+    response.raise_for_status()
+    deleted_cart_item = response.json()
+    logger.debug('deleted_cart_item: %s', deleted_cart_item)
+    logger.info('Удалил из корзины')
+
+    return deleted_cart_item
+
+
 def get_product_image_url(token, product_image_id):
     logger.info('Получаю url изображение продукта')
     url = urllib.parse.urljoin(
