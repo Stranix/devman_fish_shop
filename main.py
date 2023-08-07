@@ -3,9 +3,10 @@ import logging
 import requests.exceptions
 
 from config.settings import settings
-from src.tg.bot.loader import start_tg_bot
+from src.bot.loader import start_tg_bot
 
 logger = logging.getLogger('fish_bot')
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.ERROR)

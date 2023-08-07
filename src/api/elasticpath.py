@@ -25,8 +25,9 @@ def generate_elastic_token() -> tuple:
     response = requests.post(url, data=data)
     response.raise_for_status()
 
-    token_access = response.json()['access_token']
-    token_expire_in = response.json()['expires_in']
+    token = response.json()
+    token_access = token['access_token']
+    token_expire_in = token['expires_in']
     logger.info('Токен получен')
     logger.debug(
         'access_token: %s, expires_in: %s',
@@ -158,7 +159,7 @@ def get_product_by_id(token, product_id):
     return product
 
 
-def get_product_dy_id_with_currencies(
+def get_product_by_id_with_currencies(
         token,
         product_id,
         price_book_name='Default'

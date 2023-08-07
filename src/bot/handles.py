@@ -5,9 +5,9 @@ from telegram.ext import CallbackContext
 
 import src.api.elasticpath as shop_api
 
-from src.tg.bot.keyboards import get_products_keyboard
-from src.tg.bot.keyboards import get_sales_keyboard
-from src.tg.bot.keyboards import get_cart_keyboard
+from src.bot.keyboards import get_products_keyboard
+from src.bot.keyboards import get_sales_keyboard
+from src.bot.keyboards import get_cart_keyboard
 
 logger = logging.getLogger('fish_bot')
 
@@ -28,7 +28,7 @@ def handle_menu(update: Update, context: CallbackContext):
     token = context.bot_data['shop_token']
     logger.debug('callback_query: %s', callback_query)
 
-    product = shop_api.get_product_dy_id_with_currencies(
+    product = shop_api.get_product_by_id_with_currencies(
         token,
         callback_query.data
     )

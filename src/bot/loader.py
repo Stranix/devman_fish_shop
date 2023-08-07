@@ -8,8 +8,8 @@ from telegram.ext import (
 )
 
 from config.settings import settings
-from src.tg.bot.handles import handle_users_reply
-from src.tg.bot.jobs import regenerate_shop_token
+from src.bot.handles import handle_users_reply
+from src.bot.jobs import regenerate_shop_token
 from src.api.elasticpath import generate_elastic_token
 
 
