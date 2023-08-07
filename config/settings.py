@@ -39,4 +39,3 @@ except ValidationError as exc:
     logger.critical('Заданы не все обязательные настройки')
     logger.critical(exc.json())
     sys.exit()
-

@@ -17,7 +17,7 @@ def start(update, context):
     token = context.bot_data['shop_token']
     reply_markup = get_products_keyboard(token)
     update.message.reply_markdown_v2(
-        text=f'Привет, {user.mention_markdown_v2()}\!\nХотите заказать рыбки?',
+        text=f'Привет, {user.mention_markdown_v2()}.\nХотите заказать рыбки?',
         reply_markup=reply_markup
     )
     return 'HANDLE_MENU'
